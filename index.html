@@ -422,6 +422,7 @@
                                             haveDraw += CFG.normal6Draw / CFG.rolebuyDraw; totalPrice += nP; freeDraw5Num = 0; break;
                                         case DrawType.limit:
                                             totalLimit++;
+                                            getCount++;
                                             switch (poolType) {
                                                 case PoolType.target: totalTarget++; totalPrice += targetP; break;
                                                 case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
