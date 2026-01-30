@@ -920,7 +920,7 @@
                 log("平均每人获得武器券总量：" + (weapon / totalCount).toFixed(2));
 
                 log("========= 风险评估 (关键) =========");
-                log("稳定系数：稳定性 = 1 / (1 +  (标准差 / 均值)),数值越大越稳定，数值越小越看脸");
+                log("稳定系数：稳定性 = 1 / (1 +  (标准差 / 均值)^1.5),数值越大越稳定，数值越小越看脸");
                 log("投入自由抽稳定系数：" + GachaStabilityScore(drawList).toFixed(3));
                 log("额外氪金稳定系数：" + GachaStabilityScore(KeList).toFixed(3));
                 log("平均额外购买抽数：" + ((hyperkeDraw + keDraw) / totalCount).toFixed(2));
