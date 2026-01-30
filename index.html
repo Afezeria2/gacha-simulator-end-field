@@ -1,118 +1,328 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抽卡模拟器</title>
+    <title>抽卡模拟器 (HTML版)</title>
     <style>
-        body { font-family: "Microsoft YaHei", "Segoe UI", sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
-        h1 { text-align: center; color: #333; margin-bottom: 30px; }
-        .container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 20px; }
-        .panel { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); flex: 1; min-width: 320px; }
-        .panel h2 { margin-top: 0; border-bottom: 2px solid #e1e4e8; padding-bottom: 15px; font-size: 1.1em; color: #007bff; font-weight: 600; }
-        .form-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .form-group label { font-size: 0.9em; flex: 1; margin-right: 15px; color: #555; }
-        .form-group input[type="number"] { width: 90px; padding: 6px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: right; font-family: Consolas, monospace; transition: border 0.3s; }
-        .form-group input[type="number"]:focus { border-color: #40a9ff; outline: none; }
-        .form-group input[type="checkbox"] { transform: scale(1.2); cursor: pointer; }
-        .section-divider { border: 0; border-top: 1px dashed #eee; margin: 15px 0; }
-        
-        .full-width { width: 100%; flex: 1 1 100%; }
-        button { display: block; width: 100%; padding: 16px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,123,255,0.2); }
-        button:hover { background-color: #0056b3; }
-        button:active { transform: translateY(1px); }
-        
-        #output { background: #282c34; color: #abb2bf; padding: 25px; border-radius: 8px; font-family: "Consolas", "Monaco", monospace; white-space: pre-wrap; margin-top: 20px; min-height: 200px; line-height: 1.5; font-size: 0.95em; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
+        :root {
+            --bg-color: #f4f4f9;
+            --panel-bg: #ffffff;
+            --border-color: #ddd;
+            --primary-color: #007bff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            overflow: hidden;
+            /* Prevent body scroll */
+        }
+
+        .settings-panel {
+            flex: 0 0 65%;
+            /* Left side width */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .output-panel {
+            flex: 1;
+            background-color: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-content {
+            flex: 1;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .section {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .input-group label {
+            flex: 1;
+            margin-right: 10px;
+            font-size: 13px;
+        }
+
+        .input-group input[type="number"],
+        .input-group input[type="text"] {
+            width: 80px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+        }
+
+        .input-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button.secondary {
+            background-color: #6c757d;
+        }
+
+        button.secondary:hover {
+            background-color: #545b62;
+        }
+
+        button.clear-btn {
+            background-color: #dc3545;
+            flex: 0 0 50px;
+        }
     </style>
 </head>
+
 <body>
 
-    <h1>卡池策略模拟器</h1>
+    <h1>抽卡策略模拟器</h1>
 
     <div class="container">
-        <!-- 用户策略与环境设置 -->
-        <div class="panel">
-            <h2>模拟环境与玩家策略</h2>
-            
-            <div class="form-group"><label>模拟总人数</label><input type="number" id="p_totalCount" value="10000"></div>
-            <div class="form-group"><label>每人模拟的卡池数量</label><input type="number" id="p_pool" value="100"></div>
-            <div class="form-group"><label>初始持有的自由抽数</label><input type="number" id="p_startDraw" value="50"></div>
-            <div class="form-group"><label>每个卡池间隔可积攒的自由抽数</label><input type="number" id="p_everyPoorFreeDraw" value="15"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>目标池前垫多少层小保底</label><input type="number" id="p_dianzi" value="0"></div>
-            <div class="form-group"><label>垫子池最多投入抽数</label><input type="number" id="p_dianziLimit" value="0"></div>
-            <div class="form-group"><label>垫够层数但在X抽后补到60抽</label><input type="number" id="p_bu60Limt" value="50"></div>
-            <div class="form-group"><label>若下个池仍是目标，是否继续垫？</label><input type="checkbox" id="p_isDian"></div>
-            <div class="form-group"><label>连续目标池垫刀最大投入抽数</label><input type="number" id="p_targetDrawDianLimt" value="0"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>两目标池间最小非目标池间隔</label><input type="number" id="p_min" value="0"></div>
-            <div class="form-group"><label>两目标池间最大非目标池间隔</label><input type="number" id="p_max" value="3"></div>
-            <div class="form-group"><label>非人权池最大抽取上限 (0为不限制)</label><input type="number" id="p_useLimit" value="0"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>每多少个池出现一个人权池</label><input type="number" id="p_hyper" value="6"></div>
-            <div class="form-group"><label>人权卡需要抽取的潜能数量</label><input type="number" id="p_hyperCount" value="5"></div>
-            <div class="form-group"><label>人权池抽够潜能差X抽到240赠送潜能则补齐</label><input type="number" id="p_hyperBu240" value="30"></div>
-            <div class="form-group"><label>非人权限定卡的价值修正 (0为默认)</label><input type="number" id="p_priceChange" value="0"></div>
+        <!-- Settings Area -->
+        <div class="settings-panel">
+
+            <div class="grid-container">
+                <!-- 1. 抽卡策略 -->
+                <div class="section">
+                    <h2>抽卡策略</h2>
+                    <div id="strategy-inputs"></div>
+                </div>
+
+                <!-- 2. 垫刀测试 -->
+                <div class="section">
+                    <h2>垫刀测试参数 (Test Mode)</h2>
+                    <div id="test-inputs"></div>
+                </div>
+
+                <!-- 3. 屯抽环境 -->
+                <div class="section">
+                    <h2>屯抽环境 (运营参数)</h2>
+                    <div id="env-inputs"></div>
+                </div>
+
+                <!-- 4. 底层逻辑 -->
+                <div class="section">
+                    <h2>卡池底层逻辑</h2>
+                    <div id="system-inputs"></div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button onclick="runSimulation(false)">运行基础模拟 (realDraw)</button>
+                <button class="secondary" onclick="runSimulation(true)">运行垫刀测试 (testMode)</button>
+            </div>
         </div>
 
-        <!-- 游戏基础规则设置 -->
-        <div class="panel">
-            <h2>游戏基础规则参数</h2>
-            <div class="form-group"><label>6星基础概率</label><input type="number" id="c_per6" value="0.008" step="0.001"></div>
-            <div class="form-group"><label>5星基础概率</label><input type="number" id="c_per5" value="0.08" step="0.01"></div>
-            <div class="form-group"><label>6星概率提升幅度 (每抽)</label><input type="number" id="c_perAdd" value="0.05" step="0.01"></div>
-            <div class="form-group"><label>6星开始累加概率的抽数</label><input type="number" id="c_drawAdd" value="65"></div>
-            <div class="form-group"><label>6星硬保底抽数</label><input type="number" id="c_drawLimit" value="80"></div>
-            <div class="form-group"><label>UP角色大保底 (硬保底)</label><input type="number" id="c_DrawUpLimit" value="120"></div>
-            <div class="form-group"><label>卡池UP概率</label><input type="number" id="c_upPer" value="0.5" step="0.1"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>常驻池6星角色数量</label><input type="number" id="c_normalRole" value="5"></div>
-            <div class="form-group"><label>限定池中歪出的限定数量</label><input type="number" id="c_limitWaiRole" value="2"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>多少抽赠送一个UP潜能 (大保底)</label><input type="number" id="c_freeLimit" value="240"></div>
-            <div class="form-group"><label>不含保底免费10连阈值</label><input type="number" id="c_free30Draw" value="30"></div>
-            <div class="form-group"><label>达到阈值赠送抽数</label><input type="number" id="c_free30DrawNum" value="10"></div>
-            <div class="form-group"><label>赠送下个池10连阈值</label><input type="number" id="c_free60Draw" value="60"></div>
-            <div class="form-group"><label>下个池赠送抽数</label><input type="number" id="c_free60DrawNum" value="10"></div>
-            <div class="form-group"><label>开池免费赠送抽数</label><input type="number" id="c_poolFreeDraw" value="10"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>多少黄票兑换一抽</label><input type="number" id="c_rolebuyDraw" value="25"></div>
-            <div class="form-group"><label>重复6星获得黄票</label><input type="number" id="c_normal6Draw" value="50"></div>
-            <div class="form-group"><label>重复5星获得黄票</label><input type="number" id="c_normal5Draw" value="10"></div>
-            
-            <hr class="section-divider">
-            
-            <div class="form-group"><label>人权卡设定价值</label><input type="number" id="c_hyperPBase" value="1000"></div>
-            <div class="form-group"><label>目标限定设定价值</label><input type="number" id="c_targetPBase" value="500"></div>
-            <div class="form-group"><label>非目标限定设定价值</label><input type="number" id="c_waiPBase" value="250"></div>
-            <div class="form-group"><label>普池角色设定价值</label><input type="number" id="c_nPBase" value="100"></div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="full-width">
-            <button onclick="runSimulation()">开始模拟计算</button>
-            <div id="output">点击上方按钮开始模拟...</div>
+        <!-- Output Area -->
+        <div class="output-panel">
+            <div
+                style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
+                <span>运行结果终端</span>
+                <button onclick="clearOutput()"
+                    style="padding:2px 10px; font-size:12px; height:auto; background:#444;">清空</button>
+            </div>
+            <div id="console-output" class="output-content"></div>
         </div>
     </div>
 
     <script>
-        // --- 全局配置变量 (将由输入框填充) ---
-        let CFG = {};
+        // ==========================================
+        // 1. 定义参数配置 (包含原有注释)
+        // ==========================================
+        const paramConfig = {
+            // --- 抽卡策略 ---
+            strategy: [
+                { key: 'dianzi', label: '目标池前垫多少层小保底', val: 0, type: 'int' },
+                { key: 'dianziLimit', label: '垫子池最多抽到多少抽', val: 60, type: 'int' },
+                { key: 'bu60Limt', label: '垫子垫够的情况下超过多少抽补到60', val: 50, type: 'int' },
+                { key: 'useLimit', label: '非人权池最多抽到多少抽（填0则无上限）', val: 0, type: 'int' },
+                { key: 'isDian', label: '连发目标池是否垫小保底', val: false, type: 'bool' },
+                { key: 'targetDrawDianLimt', label: '连发目标池垫刀上限', val: 0, type: 'int' },
+                { key: 'hyperCount', label: '人权抽几潜', val: 0, type: 'int' },
+                { key: 'hyperBu240', label: '人权补井阈值(差多少抽到240则补)', val: 0, type: 'int' },
+                { key: 'priceChange', label: '非人权池限定价值修正(0不修正)', val: 0, type: 'int' }
+            ],
+            // --- 垫刀测试 ---
+            test: [
+                // istestBase 由按钮决定，不作为输入
+                { key: 'isDianTestBase', label: '模式：是否是垫子模式(否则固定模式)', val: false, type: 'bool' },
+                { key: 'testMaxBase', label: '单次模拟补抽数量 / 垫子层数上限', val: 10, type: 'int' },
+                { key: 'nowPoorDrawBase', label: '初始池已抽多少发', val: 0, type: 'int' },
+                { key: 'nowDraw6NumBase', label: '初始池6星保底多少层', val: 0, type: 'int' },
+                { key: 'isGetTargetBase', label: '初始池是否已经获得目标', val: false, type: 'bool' },
+                { key: 'targetPoolIndex', label: '目标池序号(测试模式用)', val: 0, type: 'int' }
+            ],
+            // --- 屯抽环境 ---
+            env: [
+                { key: 'totalCount', label: '总测试人数', val: 10000, type: 'int' },
+                { key: 'pool', label: '每次测试池数', val: 100, type: 'int' },
+                { key: 'startDraw', label: '初始自由抽数', val: 100, type: 'int' },
+                { key: 'everyPoorFreeDraw', label: '每个卡池能获得自由抽数', val: 50, type: 'int' },
+                { key: 'min', label: '目标池最小间隔', val: 1, type: 'int' },
+                { key: 'max', label: '目标池最大间隔', val: 3, type: 'int' },
+                { key: 'hyper', label: '每多少个目标池中出一个人权', val: 3, type: 'int' }
+            ],
+            // --- 底层逻辑 (Static Fields) ---
+            system: [
+                { key: 'per6', label: '6星基础概率', val: 0.008, type: 'float' },
+                { key: 'per5', label: '5星基础概率', val: 0.08, type: 'float' },
+                { key: 'perAdd', label: '6星基础提升幅度', val: 0.05, type: 'float' },
+                { key: 'drawAdd', label: '6星在多少抽后开始累加概率', val: 65, type: 'int' },
+                { key: 'drawLimit', label: '6星多少抽必出(硬保底)', val: 80, type: 'int' },
+                { key: 'DrawUpLimit', label: 'UP角色硬保底(大保底)', val: 120, type: 'int' },
+                { key: 'upPer', label: '卡池UP概率', val: 0.5, type: 'float' },
+                { key: 'normalRole', label: '普池6星数量', val: 5, type: 'int' },
+                { key: 'limitWaiRole', label: '池中会歪的限定数量', val: 2, type: 'int' },
+                { key: 'freeLimit', label: 'UP潜能突破赠送阈值(井)', val: 240, type: 'int' },
+                { key: 'free30Draw', label: '30抽送免费10连阈值', val: 30, type: 'int' },
+                { key: 'free30DrawNum', label: '30抽送的数量', val: 10, type: 'int' },
+                { key: 'free60Draw', label: '60抽送下池10连阈值', val: 60, type: 'int' },
+                { key: 'free60DrawNum', label: '60抽送的数量', val: 10, type: 'int' },
+                { key: 'poolFreeDraw', label: '开池获得的免费抽', val: 10, type: 'int' },
+                { key: 'rolebuyDraw', label: '花多少票换一抽', val: 25, type: 'int' },
+                { key: 'normal6Draw', label: '重复6星给多少票', val: 50, type: 'int' },
+                { key: 'normal5Draw', label: '重复5星给多少票', val: 10, type: 'int' },
+                // Values
+                { key: 'hyperPBase', label: '人权卡价值', val: 1000, type: 'float' },
+                { key: 'targetPBase', label: '目标限定价值', val: 500, type: 'float' },
+                { key: 'waiPBase', label: '非目标限定价值', val: 250, type: 'float' },
+                { key: 'nPBase', label: '普池价值', val: 100, type: 'float' },
+                { key: 'weapon4', label: '4星武器券', val: 20, type: 'float' },
+                { key: 'weapon5', label: '5星武器券', val: 200, type: 'float' },
+                { key: 'weapon6', label: '6星武器券', val: 2000, type: 'float' }
+            ]
+        };
 
-        // --- 枚举定义 ---
+        // ==========================================
+        // 2. 初始化 UI
+        // ==========================================
+        function initUI() {
+            const createInputs = (list, containerId) => {
+                const container = document.getElementById(containerId);
+                list.forEach(item => {
+                    const group = document.createElement('div');
+                    group.className = 'input-group';
+
+                    const label = document.createElement('label');
+                    label.textContent = item.label;
+
+                    const input = document.createElement('input');
+                    input.id = item.key;
+
+                    if (item.type === 'bool') {
+                        input.type = 'checkbox';
+                        input.checked = item.val;
+                    } else {
+                        input.type = 'number';
+                        input.value = item.val;
+                        if (item.type === 'float') input.step = "0.001";
+                    }
+
+                    group.appendChild(label);
+                    group.appendChild(input);
+                    container.appendChild(group);
+                });
+            };
+
+            createInputs(paramConfig.strategy, 'strategy-inputs');
+            createInputs(paramConfig.test, 'test-inputs');
+            createInputs(paramConfig.env, 'env-inputs');
+            createInputs(paramConfig.system, 'system-inputs');
+        }
+
+        initUI();
+
+        // ==========================================
+        // 3. 核心逻辑移植 (C# -> JS)
+        // ==========================================
+
+        // 全局状态对象 (用于模拟 C# static 变量)
+        let G = {};
+
+        // 枚举模拟
         const DrawType = {
             normal4: 0,
             normal5: 1,
@@ -127,33 +337,59 @@
             hyper: 2
         };
 
-        // --- 核心逻辑函数 ---
+        // 工具函数
+        function log(msg) {
+            const consoleDiv = document.getElementById('console-output');
+            consoleDiv.innerText += msg + "\n";
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
 
+        function clearOutput() {
+            document.getElementById('console-output').innerText = "";
+        }
+
+        // 从 UI 读取最新参数到全局 G 对象
+        function updateConfigFromUI() {
+            G = {};
+            Object.values(paramConfig).forEach(list => {
+                list.forEach(item => {
+                    const el = document.getElementById(item.key);
+                    if (item.type === 'bool') G[item.key] = el.checked;
+                    else if (item.type === 'int') G[item.key] = parseInt(el.value);
+                    else G[item.key] = parseFloat(el.value);
+                });
+            });
+        }
+
+        // 随机数
+        function rndNextDouble() { return Math.random(); }
+        function rndNext(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+        // draw 函数
         function draw(nowLimit6Num, nowDraw6Num, nowDraw5Num) {
-            if (nowLimit6Num === CFG.DrawUpLimit - 1) {
+            if (nowLimit6Num === G.DrawUpLimit - 1) {
                 return DrawType.limit;
             }
-            let drawPer = CFG.per6;
-            let perNow = Math.random();
+            let drawPer = G.per6;
+            let perNow = rndNextDouble();
 
-            if (nowDraw6Num === CFG.drawLimit - 1) {
+            if (nowDraw6Num === G.drawLimit - 1) {
                 return Draw6();
-            } else if (nowDraw6Num < CFG.drawAdd) {
+            } else if (nowDraw6Num < G.drawAdd) {
                 if (perNow < drawPer) {
                     return Draw6();
-                } else if (nowDraw5Num >= 9 || perNow < CFG.per5) {
+                } else if (nowDraw5Num >= 9 || perNow < G.per5) {
                     return DrawType.normal5;
                 } else {
                     return DrawType.normal4;
                 }
             }
 
-            // 概率累加阶段
-            drawPer += (nowDraw6Num + 1 - CFG.drawAdd) * CFG.perAdd;
+            drawPer += (nowDraw6Num + 1 - G.drawAdd) * G.perAdd;
 
             if (perNow < drawPer) {
                 return Draw6();
-            } else if (nowDraw5Num >= 9 || perNow < CFG.per5) {
+            } else if (nowDraw5Num >= 9 || perNow < G.per5) {
                 return DrawType.normal5;
             } else {
                 return DrawType.normal4;
@@ -161,11 +397,10 @@
         }
 
         function Draw6() {
-            if (Math.random() < CFG.upPer) {
+            if (rndNextDouble() < G.upPer) {
                 return DrawType.limit;
             }
-            let rng = Math.floor(Math.random() * (CFG.normalRole + CFG.limitWaiRole));
-            if (rng < CFG.limitWaiRole) {
+            if (rndNext(0, G.normalRole + G.limitWaiRole) < G.limitWaiRole) {
                 return DrawType.limitWai;
             }
             return DrawType.normal6;
@@ -176,21 +411,107 @@
             map[index] = true;
         }
 
-        // --- 主模拟函数 ---
-        function realDraw(totalCount, pool, dianzi, dianziLimit, bu60Limt, min, max, startDraw, everyPoorFreeDraw, isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit, priceChange) {
-            
-            // 值设定
-            let hyperP = CFG.hyperPBase;
-            let targetP = CFG.targetPBase;
-            let waiP = CFG.waiPBase;
-            let nP = CFG.nPBase;
+        // 稳定性计算
+        function GachaStabilityScore(costs) {
+            if (!costs || costs.length < 2) return 1;
+            let n = costs.length;
+            let mean = costs.reduce((a, b) => a + b, 0) / n;
+            if (mean <= 0) return 1;
 
+            let sumSquaredDiff = costs.reduce((sum, val) => sum + (val - mean) ** 2, 0);
+            let std = Math.sqrt(sumSquaredDiff / (n - 1));
+            let relativeStd = std / mean;
+
+            let k = 1;
+            let p = 1.5;
+            return 1.0 / (1.0 + k * Math.pow(relativeStd, p));
+        }
+
+        // 结果类
+        class TestResult {
+            constructor() {
+                this.index = 0;
+                this.limitGetNum = 0;
+                this.Get6Num = 0;
+                this.drawNum = 0;
+                this.keNum = 0;
+                this.weaponNum = 0;
+                this.drawStability = 0;
+                this.keStability = 0;
+                this.hit60Count = 0;
+                this.hit120Count = 0;
+                this.rolePrice = 0;
+                this.weaponPrice = 0;
+            }
+        }
+
+        let TestResults = [];
+
+        function FormatTestResult(r, isDianTestBase) {
+            let output = "";
+            if (isDianTestBase) output += "垫到小保底 " + r.index + " 层";
+            else output += "再投入 " + r.index + " 发";
+
+            output += ` 结果：
+\t 限定数：${r.limitGetNum.toFixed(2)}
+\t 6星数：${r.Get6Num.toFixed(2)}
+\t 投入自由抽：${r.drawNum.toFixed(2)}
+\t 氪金抽：${r.keNum.toFixed(2)}
+\t 武器券：${r.weaponNum.toFixed(2)}
+\t 自由抽稳定：${r.drawStability.toFixed(3)}
+\t 氪金抽稳定：${r.keStability.toFixed(3)}
+\t 60发后抽到概率：${r.hit60Count.toFixed(2)}%
+\t 吃大保底概率：${r.hit120Count.toFixed(2)}%
+\t 每自由抽角色价值：${r.rolePrice.toFixed(2)}
+\t 每自由抽武器券：${r.weaponPrice.toFixed(2)}`;
+            return output;
+        }
+
+        function PrintTopTestResults(list, top, isDianTestBase) {
+            if (!list || list.length === 0) return "无测试结果";
+            let sb = [];
+
+            const sortAndPrint = (title, sorter) => {
+                sb.push(`\n====== ${title} TOP ${top} ======`);
+                [...list].sort(sorter).slice(0, top).forEach(r => sb.push(FormatTestResult(r, isDianTestBase)));
+            };
+
+            sortAndPrint("自由抽投入最少", (a, b) => a.drawNum - b.drawNum);
+            sortAndPrint("自由抽稳定性最小", (a, b) => a.drawStability - b.drawStability); // C# OrderBy
+            sortAndPrint("自由抽稳定性最大", (a, b) => b.drawStability - a.drawStability); // C# OrderByDescending
+            sortAndPrint("氪金投入最少", (a, b) => a.keNum - b.keNum);
+            sortAndPrint("氪金抽稳定性最小", (a, b) => a.keStability - b.keStability);
+            sortAndPrint("氪金抽稳定性最大", (a, b) => b.keStability - a.keStability);
+            sortAndPrint("角色性价比最高", (a, b) => b.rolePrice - a.rolePrice);
+            sortAndPrint("武器券总量最高", (a, b) => b.weaponNum - a.weaponNum);
+            sortAndPrint("武器券性价比最高", (a, b) => b.weaponPrice - a.weaponPrice);
+            sortAndPrint("6星获取数最高", (a, b) => b.limitGetNum - a.limitGetNum);
+
+            return sb.join("\n");
+        }
+
+
+
+        // 核心大循环
+        function realDraw(totalCount, pool, dianzi, dianziLimit, bu60Limt, min, max, startDraw, everyPoorFreeDraw,
+            isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit, priceChange,
+            nowPoorDrawBase, nowDraw6NumBase, isGetTargetBase, istestBase, isDianTestBase, testMaxBase) {
+
+            if (!istestBase) {
+                log(`模拟${totalCount}人，每人抽${pool}池，目标池前垫${dianzi}层小保底。\n最多在垫子池抽到${dianziLimit}抽，如果在${bu60Limt}到${G.free60Draw - 1}抽之间垫够层数，则补到${G.free60Draw}抽。\n假设每个目标池子之间随机间隔${min}到${max}个非目标池子，目标池子抽到出为止。\n模拟开始时持有${startDraw}抽自由抽，假设每个池子之间可以屯${everyPoorFreeDraw}抽自由抽。\n如果一个目标池的下一个池子也是目标池，那么这个池子是否垫小保底：${isDian},这种情况下最多再投入${targetDrawDianLimt}抽。\n假设每${hyper}个池中有一个人权池，且人权池需要额外抽${hyperCount}个潜能。当抽够潜能时还差${hyperBu240}抽以内到${G.freeLimit}保底则补到${G.freeLimit}`);
+                if (useLimit > 0) log("非人权池最多抽到" + useLimit + "抽");
+            }
+
+            let hyperP = G.hyperPBase;
+            let targetP = G.targetPBase;
+            let waiP = G.waiPBase;
+            let nP = G.nPBase;
             if (priceChange > 0) {
+                log("将所有非人权限定的价值修正为" + priceChange);
                 targetP = priceChange;
                 waiP = priceChange;
             }
 
-            // 统计变量
             let keDraw = 0;
             let hyperkeDraw = 0;
             let weapon = 0;
@@ -200,7 +521,8 @@
             let totalPrice = 0;
             let maxKeDraw = 0;
             let hit120Count = 0;
-            let totalDrawCount = 0; 
+            let hit60Count = 0;
+            let totalDrawCount = 0;
             let totalWaiCount = 0;
 
             let totalTarget = 0;
@@ -210,69 +532,78 @@
             let useHyperDraw = 0;
             let totalHyperLimit = 0;
 
-            // 循环每一个用户
+            let drawList = [];
+            let KeList = [];
+
+            // Main Loop
             for (let i = 0; i < totalCount; i++) {
-                // 生成池子列表
                 let targetPoorList = [];
                 let n = 0;
-                while (targetPoorList.length < pool + 1) {
-                    let interval = Math.floor(Math.random() * (max - min + 1)) + min;
-                    for (let j = 0; j < interval && targetPoorList.length < pool + 1; j++) {
+                while (true) {
+                    let interval = rndNext(min, max + 1);
+                    for (let j = 0; j < interval&&n<pool + 1; j++) {
                         n++;
-                        if (n % hyper === 0) {
+                        if (n % hyper == 0) {
                             totalHyperLimit++;
                             targetPoorList.push(PoolType.hyper);
                         } else {
                             targetPoorList.push(PoolType.None);
                         }
+
+                    }
+                    if ( n >= pool + 1) {
+                        break;
                     }
                     n++;
-                    if (n % hyper === 0) {
+                    if (n % hyper == 0) {
                         totalHyperLimit++;
                         targetPoorList.push(PoolType.hyper);
                     } else {
                         totalTargetNumber++;
                         targetPoorList.push(PoolType.target);
                     }
+                    if ( n >= pool + 1) {
+                        break;
+                    }
                 }
 
-                // 修正最后一个池子的计数
+                // Adjust last element logic from C#
                 switch (targetPoorList[targetPoorList.length - 1]) {
                     case PoolType.None: break;
                     case PoolType.target: totalTargetNumber--; break;
                     case PoolType.hyper: totalHyperLimit--; break;
                 }
 
-                let limitMap = {};
-
+                let limitMap = {}; // Dictionary<int, bool>
                 let haveDraw = startDraw;
                 let next60Free = false;
-                let nowDraw6Num = 0;
                 let nowDraw5Num = 0;
                 let rolekeDraw = 0;
                 let rolehyperkeDraw = 0;
+                let nowPoorDraw = nowPoorDrawBase;
+                let nowDraw6Num = nowDraw6NumBase;
+                let istest = istestBase;
+                let isDianTest = isDianTestBase;
+                let isGetTarget = isGetTargetBase;
+                let getCount = isGetTarget ? 99999999 : 0;
+                let nowLimit6Num = nowPoorDraw;
+                let testMax = testMaxBase;
+                let pooldraw = 0;
+                let poolKedraw = 0;
 
-                // 循环每个池子
                 for (let j = 0; j < pool; j++) {
                     let poolType = targetPoorList[j];
                     let nextPoor = targetPoorList[j + 1];
 
-                    let isGetTarget = false;
-                    let nowLimit6Num = 0;
-                    let addDraw = CFG.poolFreeDraw;
-                    let nowPoorDraw = 0;
-                    let getCount = 0;
-
-                    if (next60Free) {
-                        addDraw += CFG.free60DrawNum;
-                    }
+                    let addDraw = G.poolFreeDraw;
+                    if (next60Free) addDraw += G.free60DrawNum;
 
                     let needCount = 1;
-                    if (poolType === PoolType.hyper) {
-                        needCount += hyperCount;
-                    }
+                    if (poolType === PoolType.hyper) needCount += hyperCount;
 
-                    // 1. 处理免费送的抽
+                    addDraw -= nowPoorDraw; // Adjust logic from C#
+
+                    // Pre-draw free pulls (开池送的)
                     for (let h = 0; h < addDraw; h++) {
                         nowPoorDraw++;
                         totalDrawCount++;
@@ -280,385 +611,397 @@
 
                         switch (drawFree) {
                             case DrawType.normal4:
-                                weapon += CFG.weapon4;
+                                weapon += G.weapon4;
                                 nowLimit6Num++; nowDraw6Num++; nowDraw5Num++;
                                 break;
                             case DrawType.normal5:
-                                weapon += CFG.weapon5;
-                                haveDraw += CFG.normal5Draw / CFG.rolebuyDraw;
+                                weapon += G.weapon5;
+                                haveDraw += G.normal5Draw / G.rolebuyDraw;
                                 nowLimit6Num++; nowDraw6Num++; nowDraw5Num = 0;
                                 break;
                             case DrawType.limitWai:
-                                totalLimit++; totalN6Number++; weapon += CFG.weapon6;
-                                let indexWai = Math.random() < 0.5 ? j - 2 : j - 1;
-                                if (limitMap[indexWai]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                AddLimitMap(limitMap, indexWai);
-
-                                if (indexWai >= 0) {
-                                    switch (targetPoorList[indexWai]) {
-                                        case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                        case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                        default: totalWaiCount++; totalPrice += waiP; break;
+                                totalLimit++; totalN6Number++; weapon += G.weapon6;
+                                {
+                                    let index = rndNextDouble() < 0.5 ? j - 2 : j - 1;
+                                    if (limitMap[index]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                    AddLimitMap(limitMap, index);
+                                    if (index >= 0) {
+                                        if (targetPoorList[index] === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                        else if (targetPoorList[index] === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                        else { totalWaiCount++; totalPrice += waiP; }
                                     }
                                 }
                                 nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0;
                                 break;
                             case DrawType.normal6:
-                                totalWaiCount++; totalPrice += nP; totalN6Number++; weapon += CFG.weapon6;
-                                haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
+                                totalWaiCount++; totalPrice += nP; totalN6Number++; weapon += G.weapon6;
+                                haveDraw += G.normal6Draw / G.rolebuyDraw;
                                 nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0;
                                 break;
                             case DrawType.limit:
                                 totalLimit++;
-                                switch (poolType) {
-                                    case PoolType.target: getCount++; totalTarget++; totalPrice += targetP; break;
-                                    case PoolType.hyper: getCount++; totalHyper++; totalPrice += hyperP; break;
-                                    default: totalWaiCount++; totalPrice += waiP; break;
-                                }
-                                totalN6Number++; isGetTarget = true; weapon += CFG.weapon6;
-                                if (limitMap[j]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
+                                if (poolType === PoolType.target) { getCount++; totalTarget++; totalPrice += targetP; }
+                                else if (poolType === PoolType.hyper) { getCount++; totalHyper++; totalPrice += hyperP; }
+                                else { totalWaiCount++; totalPrice += waiP; }
+
+                                totalN6Number++; isGetTarget = true; weapon += G.weapon6;
+                                if (limitMap[j]) haveDraw += G.normal6Draw / G.rolebuyDraw;
                                 AddLimitMap(limitMap, j);
                                 nowDraw6Num = 0; nowDraw5Num = 0;
                                 break;
                         }
                     }
 
-                    // 2. 正式抽卡阶段
-                    let use30Free = false;
-                    if (poolType !== PoolType.None) {
-                        while ((!isGetTarget || getCount < needCount) || 
-                               (nowPoorDraw >= bu60Limt && nowPoorDraw < CFG.free60Draw) || 
-                               (poolType === PoolType.hyper && nowPoorDraw % CFG.freeLimit > CFG.freeLimit - hyperBu240)) {
-                            
-                            if (useLimit > 0 && nowPoorDraw >= useLimit && poolType !== PoolType.hyper) break;
+                    let testOut = false;
+                    if (!istest || testMaxBase !== 0) {
+                        let use30Free = false;
+                        if (poolType !== PoolType.None) {
+                            while (istest || (!isGetTarget || getCount < needCount) || (nowPoorDraw >= bu60Limt && nowPoorDraw < G.free60Draw) || (poolType === PoolType.hyper && nowPoorDraw % G.freeLimit > G.freeLimit - hyperBu240)) {
 
-                            nowPoorDraw++;
-                            if (haveDraw <= 0) {
-                                haveDraw++;
-                                if (poolType === PoolType.target) { keDraw++; rolekeDraw++; }
-                                else { hyperkeDraw++; rolehyperkeDraw++; }
-                            }
-                            if (poolType === PoolType.target) useTargetDraw++;
-                            else useHyperDraw++;
-
-                            haveDraw--;
-                            
-                            if (nowPoorDraw % CFG.freeLimit === 0) getCount++;
-                            if (nowLimit6Num === CFG.DrawUpLimit - 1) hit120Count++;
-
-                            totalDrawCount++;
-                            let targetDraw = draw(isGetTarget ? 0 : nowLimit6Num, nowDraw6Num, nowDraw5Num);
-
-                            switch (targetDraw) {
-                                case DrawType.normal4:
-                                    weapon += CFG.weapon4;
-                                    nowLimit6Num++; nowDraw6Num++; nowDraw5Num++;
-                                    break;
-                                case DrawType.normal5:
-                                    weapon += CFG.weapon5;
-                                    haveDraw += CFG.normal5Draw / CFG.rolebuyDraw;
-                                    nowLimit6Num++; nowDraw6Num++; nowDraw5Num = 0;
-                                    break;
-                                case DrawType.limitWai:
-                                    totalLimit++; totalN6Number++; weapon += CFG.weapon6;
-                                    let index = Math.random() < 0.5 ? j - 2 : j - 1;
-                                    if (limitMap[index]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                    AddLimitMap(limitMap, index);
-                                    if (index >= 0) {
-                                        switch (targetPoorList[index]) {
-                                            case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                            case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                            default: totalWaiCount++; totalPrice += waiP; break;
-                                        }
-                                    }
-                                    nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0;
-                                    break;
-                                case DrawType.normal6:
-                                    totalWaiCount++; totalPrice += nP; totalN6Number++; weapon += CFG.weapon6;
-                                    haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                    nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0;
-                                    break;
-                                case DrawType.limit:
-                                    totalLimit++; getCount++;
-                                    switch (poolType) {
-                                        case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                        case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                        default: totalWaiCount++; totalPrice += waiP; break;
-                                    }
-                                    totalN6Number++; isGetTarget = true; weapon += CFG.weapon6;
-                                    if (limitMap[j]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                    AddLimitMap(limitMap, j);
-                                    nowDraw6Num = 0; nowDraw5Num = 0;
-                                    break;
-                            }
-
-                            // 30抽送的免费10连
-                            if (!use30Free && nowPoorDraw >= CFG.free30Draw) {
-                                use30Free = true;
-                                let freeDraw5Num = 0;
-                                for (let h = 0; h < CFG.free30DrawNum; h++) {
-                                    let drawFree = draw(0, 0, freeDraw5Num);
-
-                                    switch (drawFree) {
-                                        case DrawType.normal4:
-                                            weapon += CFG.weapon4; freeDraw5Num++; break;
-                                        case DrawType.normal5:
-                                            weapon += CFG.weapon5; haveDraw += CFG.normal5Draw / CFG.rolebuyDraw; freeDraw5Num = 0; break;
-                                        case DrawType.limitWai:
-                                            totalLimit++; totalN6Number++; weapon += CFG.weapon6;
-                                            let index = Math.random() < 0.5 ? j - 2 : j - 1;
-                                            if (limitMap[index]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                            AddLimitMap(limitMap, index);
-                                            if (index >= 0) {
-                                                switch (targetPoorList[index]) {
-                                                    case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                                    case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                                    default: totalWaiCount++; totalPrice += waiP; break;
-                                                }
-                                            }
-                                            freeDraw5Num = 0; break;
-                                        case DrawType.normal6:
-                                            totalN6Number++; totalWaiCount++; weapon += CFG.weapon6;
-                                            haveDraw += CFG.normal6Draw / CFG.rolebuyDraw; totalPrice += nP; freeDraw5Num = 0; break;
-                                        case DrawType.limit:
-                                            totalLimit++;
-                                            getCount++;
-                                            switch (poolType) {
-                                                case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                                case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                                default: totalWaiCount++; totalPrice += waiP; break;
-                                            }
-                                            totalN6Number++; isGetTarget = true; weapon += CFG.weapon6;
-                                            if (limitMap[j]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                            AddLimitMap(limitMap, j);
-                                            freeDraw5Num = 0; break;
-                                    }
+                                if (!istest) {
+                                    if (useLimit > 0 && nowPoorDraw >= useLimit && poolType !== PoolType.hyper) break;
                                 }
-                            }
-                        }
-                    }
 
-                    // 3. 垫刀逻辑
-                    if (poolType === PoolType.None || isDian) {
-                        let TargetDianDraw = 0;
-                        if (nextPoor !== PoolType.None && nowDraw6Num < dianzi) {
-                            while (nowDraw6Num < dianzi || (nowPoorDraw >= bu60Limt && nowPoorDraw < CFG.free60Draw)) {
-                                if (useLimit > 0 && nowPoorDraw >= useLimit) break;
+                                pooldraw++;
                                 nowPoorDraw++;
-
-                                if (nextPoor === PoolType.target) useTargetDraw++;
-                                else useHyperDraw++;
-
-                                TargetDianDraw++;
                                 if (haveDraw <= 0) {
                                     haveDraw++;
-                                    if (nextPoor === PoolType.target) { keDraw++; rolekeDraw++; }
-                                    else { hyperkeDraw++; rolehyperkeDraw++; }
+                                    if (poolType === PoolType.target) { poolKedraw++; keDraw++; rolekeDraw++; }
+                                    else { poolKedraw++; hyperkeDraw++; rolehyperkeDraw++; }
                                 }
+                                if (poolType === PoolType.target) useTargetDraw++;
+                                else useHyperDraw++;
 
                                 haveDraw--;
-                                totalDrawCount++;
-                                let drawDianZi = draw(isGetTarget ? 0 : nowLimit6Num, nowDraw6Num, nowDraw5Num);
+                                if (nowPoorDraw % G.freeLimit === 0) getCount++;
+                                if (nowLimit6Num === G.DrawUpLimit - 1) hit120Count++;
 
-                                switch (drawDianZi) {
-                                    case DrawType.normal4:
-                                        weapon += CFG.weapon4; nowLimit6Num++; nowDraw6Num++; nowDraw5Num++; break;
-                                    case DrawType.normal5:
-                                        weapon += CFG.weapon5; haveDraw += CFG.normal5Draw / CFG.rolebuyDraw;
-                                        nowLimit6Num++; nowDraw6Num++; nowDraw5Num = 0; break;
+                                totalDrawCount++;
+                                let targetDraw = draw(isGetTarget ? 0 : nowLimit6Num, nowDraw6Num, nowDraw5Num);
+
+                                // --- Copy Case Switch Logic for Target Draw ---
+                                switch (targetDraw) {
+                                    case DrawType.normal4: weapon += G.weapon4; nowLimit6Num++; nowDraw6Num++; nowDraw5Num++; break;
+                                    case DrawType.normal5: weapon += G.weapon5; haveDraw += G.normal5Draw / G.rolebuyDraw; nowLimit6Num++; nowDraw6Num++; nowDraw5Num = 0; break;
                                     case DrawType.limitWai:
-                                        totalLimit++; totalN6Number++; weapon += CFG.weapon6;
-                                        let index = Math.random() < 0.5 ? j - 2 : j - 1;
-                                        if (limitMap[index]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                        AddLimitMap(limitMap, index);
-                                        if (index >= 0) {
-                                            switch (targetPoorList[index]) {
-                                                case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                                case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                                default: totalWaiCount++; totalPrice += waiP; break;
+                                        totalLimit++; totalN6Number++; weapon += G.weapon6;
+                                        {
+                                            let index = rndNextDouble() < 0.5 ? j - 2 : j - 1;
+                                            if (limitMap[index]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                            AddLimitMap(limitMap, index);
+                                            if (index >= 0) {
+                                                if (targetPoorList[index] === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                else if (targetPoorList[index] === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                else { totalWaiCount++; totalPrice += waiP; }
                                             }
                                         }
                                         nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0; break;
-                                    case DrawType.normal6:
-                                        totalWaiCount++; totalN6Number++; weapon += CFG.weapon6;
-                                        haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                        nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0; break;
+                                    case DrawType.normal6: totalWaiCount++; totalPrice += nP; totalN6Number++; weapon += G.weapon6; haveDraw += G.normal6Draw / G.rolebuyDraw; nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0; break;
                                     case DrawType.limit:
-                                        totalLimit++;
-                                        switch (poolType) {
-                                            case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                            case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                            default: totalWaiCount++; totalPrice += waiP; break;
-                                        }
-                                        totalN6Number++; isGetTarget = true; weapon += CFG.weapon6;
-                                        if (limitMap[j]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
+                                        totalLimit++; getCount++;
+                                        if (poolType === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                        else if (poolType === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                        else { totalWaiCount++; totalPrice += waiP; }
+                                        totalN6Number++; isGetTarget = true; weapon += G.weapon6;
+                                        if (limitMap[j]) haveDraw += G.normal6Draw / G.rolebuyDraw;
                                         AddLimitMap(limitMap, j);
                                         nowDraw6Num = 0; nowDraw5Num = 0; break;
                                 }
 
-                                // 垫刀阶段触发30抽赠送
-                                if (!use30Free && nowPoorDraw >= CFG.free30Draw) {
+                                // 30 Free Draw Logic
+                                if (!use30Free && nowPoorDraw >= G.free30Draw) {
                                     use30Free = true;
                                     let freeDraw5Num = 0;
-                                    for (let h = 0; h < CFG.free30DrawNum; h++) {
-                                        let drawFree = draw(0, 0, freeDraw5Num);
+                                    for (let h = 0; h < G.free30DrawNum; h++) {
+                                        totalDrawCount++;
+                                        let drawFree = draw(0, 0, freeDraw5Num); // logic simplified as in C#
                                         switch (drawFree) {
-                                            case DrawType.normal4:
-                                                weapon += CFG.weapon4; freeDraw5Num++; break;
-                                            case DrawType.normal5:
-                                                weapon += CFG.weapon5; haveDraw += CFG.normal5Draw / CFG.rolebuyDraw; freeDraw5Num = 0; break;
+                                            case DrawType.normal4: weapon += G.weapon4; freeDraw5Num++; break;
+                                            case DrawType.normal5: weapon += G.weapon5; haveDraw += G.normal5Draw / G.rolebuyDraw; freeDraw5Num = 0; break;
                                             case DrawType.limitWai:
-                                                totalLimit++; totalN6Number++; weapon += CFG.weapon6;
-                                                let index = Math.random() < 0.5 ? j - 2 : j - 1;
-                                                if (limitMap[index]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
-                                                AddLimitMap(limitMap, index);
-                                                if (index >= 0) {
-                                                    switch (targetPoorList[index]) {
-                                                        case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                                        case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                                        default: totalPrice += waiP; totalWaiCount++; break;
+                                                totalLimit++; totalN6Number++; weapon += G.weapon6;
+                                                {
+                                                    let index = rndNextDouble() < 0.5 ? j - 2 : j - 1;
+                                                    if (limitMap[index]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                                    AddLimitMap(limitMap, index);
+                                                    if (index >= 0) {
+                                                        if (targetPoorList[index] === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                        else if (targetPoorList[index] === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                        else { totalWaiCount++; totalPrice += waiP; }
                                                     }
                                                 }
                                                 freeDraw5Num = 0; break;
-                                            case DrawType.normal6:
-                                                totalN6Number++; totalWaiCount++; weapon += CFG.weapon6;
-                                                haveDraw += CFG.normal6Draw / CFG.rolebuyDraw; freeDraw5Num = 0; break;
+                                            case DrawType.normal6: totalN6Number++; totalWaiCount++; weapon += G.weapon6; haveDraw += G.normal6Draw / G.rolebuyDraw; totalPrice += nP; freeDraw5Num = 0; break;
                                             case DrawType.limit:
-                                                totalLimit++;
-                                                switch (poolType) {
-                                                    case PoolType.target: totalTarget++; totalPrice += targetP; break;
-                                                    case PoolType.hyper: totalHyper++; totalPrice += hyperP; break;
-                                                    default: totalPrice += waiP; totalWaiCount++; break;
-                                                }
-                                                totalN6Number++; isGetTarget = true; weapon += CFG.weapon6;
-                                                if (limitMap[j]) haveDraw += CFG.normal6Draw / CFG.rolebuyDraw;
+                                                totalLimit++; getCount++;
+                                                if (poolType === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                else if (poolType === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                else { totalWaiCount++; totalPrice += waiP; }
+                                                totalN6Number++; isGetTarget = true; weapon += G.weapon6;
+                                                if (limitMap[j]) haveDraw += G.normal6Draw / G.rolebuyDraw;
                                                 AddLimitMap(limitMap, j);
                                                 freeDraw5Num = 0; break;
                                         }
                                     }
                                 }
 
-                                if (nowPoorDraw >= bu60Limt && nowPoorDraw < CFG.free60Draw) {
-                                    continue;
-                                }
-                                if (poolType === PoolType.None) {
-                                    if (nowPoorDraw >= dianziLimit) break;
-                                } else {
-                                    if (TargetDianDraw >= targetDrawDianLimt) break;
+                                if (nowPoorDraw === 60) hit60Count++;
+
+                                if (istest) {
+                                    if (isDianTest) {
+                                        if (nowDraw6Num >= testMax) { istest = false; testOut = true; break; }
+                                    } else {
+                                        testMax--;
+                                        if (testMax <= 0) { istest = false; testOut = true; break; }
+                                    }
                                 }
                             }
                         }
+
+                        if (!testOut && (poolType === PoolType.None || isDian)) {
+                            let TargetDianDraw = 0;
+                            if (testOut || (nextPoor !== PoolType.None && nowDraw6Num < dianzi)) {
+                                while (istest || nowDraw6Num < dianzi || (nowPoorDraw >= bu60Limt && nowPoorDraw < G.free60Draw)) {
+                                    if (!istest) {
+                                        if (useLimit > 0 && nowPoorDraw >= useLimit) break;
+                                    }
+                                    pooldraw++;
+                                    nowPoorDraw++;
+
+                                    if (nextPoor === PoolType.target) useTargetDraw++;
+                                    else useHyperDraw++;
+
+                                    TargetDianDraw++;
+                                    if (haveDraw <= 0) {
+                                        haveDraw++;
+                                        if (nextPoor === PoolType.target) { poolKedraw++; keDraw++; rolekeDraw++; }
+                                        else { poolKedraw++; hyperkeDraw++; rolehyperkeDraw++; }
+                                    }
+
+                                    haveDraw--;
+                                    totalDrawCount++;
+                                    let drawDianZi = draw(isGetTarget ? 0 : nowLimit6Num, nowDraw6Num, nowDraw5Num);
+
+                                    // Copy Dianzi Switch
+                                    switch (drawDianZi) {
+                                        case DrawType.normal4: weapon += G.weapon4; nowLimit6Num++; nowDraw6Num++; nowDraw5Num++; break;
+                                        case DrawType.normal5: weapon += G.weapon5; haveDraw += G.normal5Draw / G.rolebuyDraw; nowLimit6Num++; nowDraw6Num++; nowDraw5Num = 0; break;
+                                        case DrawType.limitWai:
+                                            totalLimit++; totalN6Number++; weapon += G.weapon6;
+                                            {
+                                                let index = rndNextDouble() < 0.5 ? j - 2 : j - 1;
+                                                if (limitMap[index]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                                AddLimitMap(limitMap, index);
+                                                if (index >= 0) {
+                                                    if (targetPoorList[index] === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                    else if (targetPoorList[index] === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                    else { totalWaiCount++; totalPrice += waiP; }
+                                                }
+                                            }
+                                            nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0; break;
+                                        case DrawType.normal6: totalWaiCount++; totalN6Number++; weapon += G.weapon6; haveDraw += G.normal6Draw / G.rolebuyDraw; nowLimit6Num++; nowDraw6Num = 0; nowDraw5Num = 0; break;
+                                        case DrawType.limit:
+                                            totalLimit++;
+                                            if (poolType === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                            else if (poolType === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                            else { totalWaiCount++; totalPrice += waiP; }
+                                            totalN6Number++; isGetTarget = true; weapon += G.weapon6;
+                                            if (limitMap[j]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                            AddLimitMap(limitMap, j);
+                                            nowDraw6Num = 0; nowDraw5Num = 0; break;
+                                    }
+
+                                    // 30 Free Logic in Dianzi
+                                    if (!use30Free && nowPoorDraw >= G.free30Draw) {
+                                        use30Free = true;
+                                        let freeDraw5Num = 0;
+                                        for (let h = 0; h < G.free30DrawNum; h++) {
+                                            let drawFree = draw(0, 0, freeDraw5Num);
+                                            switch (drawFree) {
+                                                case DrawType.normal4: weapon += G.weapon4; freeDraw5Num++; break;
+                                                case DrawType.normal5: weapon += G.weapon5; haveDraw += G.normal5Draw / G.rolebuyDraw; freeDraw5Num = 0; break;
+                                                case DrawType.limitWai:
+                                                    totalLimit++; totalN6Number++; weapon += G.weapon6;
+                                                    {
+                                                        let index = rndNextDouble() < 0.5 ? j - 2 : j - 1;
+                                                        if (limitMap[index]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                                        AddLimitMap(limitMap, index);
+                                                        if (index >= 0) {
+                                                            if (targetPoorList[index] === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                            else if (targetPoorList[index] === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                            else { totalPrice += waiP; totalWaiCount++; }
+                                                        }
+                                                    }
+                                                    freeDraw5Num = 0; break;
+                                                case DrawType.normal6: totalN6Number++; totalWaiCount++; weapon += G.weapon6; haveDraw += G.normal6Draw / G.rolebuyDraw; freeDraw5Num = 0; break;
+                                                case DrawType.limit:
+                                                    totalLimit++; getCount++;
+                                                    if (poolType === PoolType.target) { totalTarget++; totalPrice += targetP; }
+                                                    else if (poolType === PoolType.hyper) { totalHyper++; totalPrice += hyperP; }
+                                                    else { totalPrice += waiP; totalWaiCount++; }
+                                                    totalN6Number++; isGetTarget = true; weapon += G.weapon6;
+                                                    if (limitMap[j]) haveDraw += G.normal6Draw / G.rolebuyDraw;
+                                                    AddLimitMap(limitMap, j);
+                                                    freeDraw5Num = 0; break;
+                                            }
+                                        }
+                                    }
+
+                                    if (nowPoorDraw >= bu60Limt && nowPoorDraw < G.free60Draw) continue;
+
+                                    if (!istest) {
+                                        if (poolType === PoolType.None) {
+                                            if (nowPoorDraw >= dianziLimit) break;
+                                        } else {
+                                            if (TargetDianDraw >= targetDrawDianLimt) break;
+                                        }
+                                    } else if (istest) {
+                                        if (isDianTest) {
+                                            if (nowDraw6Num >= testMax) { istest = false; testOut = true; break; }
+                                        } else {
+                                            testMax--;
+                                            if (testMax <= 0) { istest = false; testOut = true; break; }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (nowPoorDraw >= G.free60Draw) next60Free = true;
+                        else next60Free = false;
                     }
 
-                    if (nowPoorDraw >= CFG.free60Draw) {
-                        next60Free = true;
-                    } else {
-                        next60Free = false;
-                    }
+                    istest = false;
                     haveDraw += everyPoorFreeDraw;
-                } // End of Pool Loop
+                    if (pooldraw != 0) {
+                        drawList.push(pooldraw);
+                        KeList.push(poolKedraw);
+                    }
+                    pooldraw = 0;
+                    poolKedraw = 0;
+                    nowLimit6Num = 0;
+                    isGetTarget = false;
+                    nowPoorDraw = 0;
+                    getCount = 0;
+                    testOut = false;
+                } // End Pool Loop
 
                 if (rolekeDraw + rolehyperkeDraw > maxKeDraw) maxKeDraw = rolekeDraw + rolehyperkeDraw;
                 limitGettotal += Object.keys(limitMap).length;
 
-            } // End of User Loop
+            } // End Person Loop
 
-            // --- 输出结果 ---
-            let out = [];
-            out.push("模拟 " + totalCount + " 人，每人抽 " + pool + " 池");
-            out.push("\n========= 基础统计 =========");
-            out.push("平均每人经历人权池：" + (totalHyperLimit / totalCount).toFixed(2));
-            out.push("平均每人经历目标池：" + (totalTargetNumber / totalCount).toFixed(2));
 
-            out.push("\n========= 产出统计 =========");
-            out.push("平均获得人权卡(本体+潜能)：" + (totalHyper / totalCount).toFixed(2));
-            out.push("平均获得目标UP(人权外)：" + (totalTarget / totalCount).toFixed(2));
-            out.push("平均每人获得限定数量：" + (totalLimit / totalCount).toFixed(2));
-            out.push("平均获得6星总数：" + (totalN6Number / totalCount).toFixed(2));
-            out.push("图鉴收集率：" + (limitGettotal / totalCount / pool * 100).toFixed(2) + "%");
+            if (!istestBase) {
+                log("\n========= 基础统计 =========");
+                log("平均每人经历人权池：" + (totalHyperLimit / totalCount).toFixed(2));
+                log("平均每人经历目标池：" + (totalTargetNumber / totalCount).toFixed(2));
 
-            out.push("\n========= 成本与价值 =========");
-            out.push("平均每人每人权池投入的自由抽数(含垫子)：" + (useHyperDraw / totalHyperLimit).toFixed(2));
-            out.push("平均每人每目标池投入的自由抽数(含垫子)：" + (useTargetDraw / totalTargetNumber).toFixed(2));
-            out.push("平均每人每人权池需要额外购买的抽数(含垫子)：" + (hyperkeDraw / totalHyperLimit).toFixed(2));
-            out.push("平均每人每目标池需要额外购买的抽数(人权外)：" + (keDraw / totalTargetNumber).toFixed(2));
+                log("========= 产出统计 =========");
+                log("平均获得人权卡(本体+潜能)：" + (totalHyper / totalCount).toFixed(2));
+                log("平均获得目标UP(人权外)：" + (totalTarget / totalCount).toFixed(2));
+                log("平均每人获得限定数量：" + (totalLimit / totalCount).toFixed(2));
+                log("平均获得6星总数：" + (totalN6Number / totalCount).toFixed(2));
+                log("图鉴收集率：" + (limitGettotal / totalCount / pool * 100).toFixed(2) + "%");
 
-            out.push("平均每人每池获得武器券总量：" + (weapon / totalCount / pool).toFixed(2));
+                log("========= 成本与价值 =========");
+                log("平均每人每人权池投入的自由抽数（无论氪金还是非氪金）（包括垫子投入）：" + (useHyperDraw / totalHyperLimit).toFixed(2));
+                log("平均每人每目标池投入的自由抽数（无论氪金还是非氪金）（包括垫子投入）：" + (useTargetDraw / totalTargetNumber).toFixed(2));
+                log("平均每人每人权池需要额外购买的抽数（包括垫子投入）：" + (hyperkeDraw / totalHyperLimit).toFixed(2));
+                log("平均每人每目标池需要额外购买的抽数（包括垫子投入）（人权池外）：" + (keDraw / totalTargetNumber).toFixed(2));
 
-            out.push("\n========= 风险评估 =========");
-            out.push("平均额外购买抽数：" + ((hyperkeDraw + keDraw) / totalCount).toFixed(2));
-            out.push("最黑非酋额外购买抽数：" + maxKeDraw);
-            out.push("120抽硬保底触发概率：" + (hit120Count / (totalHyperLimit + totalTargetNumber) * 100).toFixed(4) + "%");
+                log("平均每人每池获得武器券总量(包括垫子池和非目标池)：" + (weapon / totalCount / pool).toFixed(2));
+                log("平均每人获得限定数量：" + (totalLimit / totalCount).toFixed(2));
+                log("平均获得6星总数：" + (totalN6Number / totalCount).toFixed(2));
 
-            out.push("\n========= 每一抽的含金量 =========");
-            out.push("人权角色每个价值：" + hyperP);
-            out.push("目标池限定每个价值：" + targetP);
-            out.push("非目标池限定每个价值：" + waiP);
-            out.push("普池角色每个价值：" + nP);
-            out.push("每自由抽的角色价值：" + (totalPrice / (useTargetDraw + useHyperDraw)).toFixed(2));
-            out.push("每自由抽产出武器券：" + (weapon / (useTargetDraw + useHyperDraw)).toFixed(2));
+                log("========= 成本与价值 =========");
+                log("平均每人投入的自由抽数（无论氪金还是非氪金）（包括垫子投入）：" + (useTargetDraw / totalCount).toFixed(2));
+                log("平均每人需要额外购买的抽数（包括垫子投入）：" + (keDraw / totalCount).toFixed(2));
+                log("平均每人获得武器券总量：" + (weapon / totalCount).toFixed(2));
 
-            document.getElementById("output").textContent = out.join("\n");
+                log("========= 风险评估 (关键) =========");
+                log("稳定系数：稳定性 = 1 / (1 +  (标准差 / 均值)),数值越大越稳定，数值越小越看脸");
+                log("投入自由抽稳定系数：" + GachaStabilityScore(drawList).toFixed(3));
+                log("额外氪金稳定系数：" + GachaStabilityScore(KeList).toFixed(3));
+                log("平均额外购买抽数：" + ((hyperkeDraw + keDraw) / totalCount).toFixed(2));
+                log("最黑非酋额外购买抽数：" + maxKeDraw);
+                log("60发之后才抽到的概率：" + (hit60Count / (totalHyperLimit + totalTargetNumber) * 100).toFixed(4) + "% (占所有目标池和人权池的比例)");
+                log("120抽硬保底触发概率：" + (hit120Count / (totalHyperLimit + totalTargetNumber) * 100).toFixed(4) + "% (占所有目标池和人权池的比例)");
+
+                log("========= 每一抽的含金量 =========");
+                log("人权角色每个价值：" + hyperP);
+                log("目标池限定每个价值：" + targetP);
+                log("非目标池限定每个价值：" + waiP);
+                log("普池角色每个价值：" + nP);
+                log("每自由抽的角色价值：" + (totalPrice / (useTargetDraw + useHyperDraw)).toFixed(2));
+                log("每自由抽产出武器券：" + (weapon / (useTargetDraw + useHyperDraw)).toFixed(2));
+
+            } else {
+                let r = new TestResult();
+                r.index = testMaxBase;
+                r.limitGetNum = totalLimit / totalCount;
+                r.Get6Num = totalN6Number / totalCount;
+                r.drawNum = useTargetDraw / totalCount;
+                r.keNum = keDraw / totalCount;
+                r.weaponNum = weapon / totalCount;
+                r.drawStability = GachaStabilityScore(drawList);
+                r.keStability = GachaStabilityScore(KeList);
+                r.hit60Count = hit60Count / (totalHyperLimit + totalTargetNumber) * 100;
+                r.hit120Count = hit120Count / (totalHyperLimit + totalTargetNumber) * 100;
+                r.rolePrice = totalPrice / (useTargetDraw + useHyperDraw);
+                r.weaponPrice = weapon / (useTargetDraw + useHyperDraw);
+                TestResults.push(r);
+            }
         }
 
-        // --- 读取配置并启动 ---
-        function runSimulation() {
-            document.getElementById("output").textContent = "模拟计算中...";
+        function testMode(totalCount, pool, dianzi, dianziLimit, bu60Limt, min, max, startDraw, everyPoorFreeDraw,
+            isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit, priceChange,
+            nowPoorDrawBase, nowDraw6NumBase, isGetTargetBase, istestBase, isDianTestBase, testMaxBase, targetPoolIndex) {
 
-            // 使用 setTimeout 让 UI 有机会刷新显示 "计算中"
+            TestResults = [];
+            if (!istestBase) {
+                realDraw(totalCount, pool, dianzi, dianziLimit, bu60Limt, min, max, startDraw, everyPoorFreeDraw, isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit, priceChange, nowPoorDrawBase, nowDraw6NumBase, isGetTargetBase, istestBase, isDianTestBase, testMaxBase);
+            } else {
+                for (let i = 0; i < testMaxBase + 1; i++) {
+                    realDraw(totalCount, targetPoolIndex + 1, dianzi, dianziLimit, bu60Limt, targetPoolIndex, targetPoolIndex,
+                        startDraw, everyPoorFreeDraw, isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit,
+                        priceChange, nowPoorDrawBase, nowDraw6NumBase, isGetTargetBase, istestBase, isDianTestBase, i);
+                }
+                log(PrintTopTestResults(TestResults, 3, isDianTestBase));
+                log("========= 总表=========");
+                TestResults.forEach(item => {
+                    log(FormatTestResult(item, isDianTestBase));
+                });
+            }
+        }
+
+        // ==========================================
+        // 4. 运行逻辑
+        // ==========================================
+        function runSimulation(isTestMode) {
+            updateConfigFromUI();
+            clearOutput();
+            log(isTestMode ? "正在运行垫刀测试..." : "正在运行基础模拟...");
+
+            // 延迟执行以允许 UI 刷新
             setTimeout(() => {
-                // 1. 读取全局配置
-                CFG = {
-                    per6: parseFloat(document.getElementById("c_per6").value),
-                    per5: parseFloat(document.getElementById("c_per5").value),
-                    perAdd: parseFloat(document.getElementById("c_perAdd").value),
-                    drawAdd: parseInt(document.getElementById("c_drawAdd").value),
-                    drawLimit: parseInt(document.getElementById("c_drawLimit").value),
-                    DrawUpLimit: parseFloat(document.getElementById("c_DrawUpLimit").value),
-                    upPer: parseFloat(document.getElementById("c_upPer").value),
-                    normalRole: parseInt(document.getElementById("c_normalRole").value),
-                    limitWaiRole: parseInt(document.getElementById("c_limitWaiRole").value),
-                    freeLimit: parseFloat(document.getElementById("c_freeLimit").value),
-                    free30Draw: parseFloat(document.getElementById("c_free30Draw").value),
-                    free30DrawNum: parseInt(document.getElementById("c_free30DrawNum").value),
-                    free60Draw: parseFloat(document.getElementById("c_free60Draw").value),
-                    free60DrawNum: parseInt(document.getElementById("c_free60DrawNum").value),
-                    poolFreeDraw: parseInt(document.getElementById("c_poolFreeDraw").value),
-                    rolebuyDraw: parseFloat(document.getElementById("c_rolebuyDraw").value),
-                    normal6Draw: parseFloat(document.getElementById("c_normal6Draw").value),
-                    normal5Draw: parseFloat(document.getElementById("c_normal5Draw").value),
-                    weapon4: 20,
-                    weapon5: 200,
-                    weapon6: 2000,
-                    hyperPBase: parseFloat(document.getElementById("c_hyperPBase").value),
-                    targetPBase: parseFloat(document.getElementById("c_targetPBase").value),
-                    waiPBase: parseFloat(document.getElementById("c_waiPBase").value),
-                    nPBase: parseFloat(document.getElementById("c_nPBase").value)
-                };
-
-                // 2. 读取参数 (对应 realDraw 的参数顺序)
-                let totalCount = parseInt(document.getElementById("p_totalCount").value);
-                let pool = parseInt(document.getElementById("p_pool").value);
-                let dianzi = parseInt(document.getElementById("p_dianzi").value);
-                let dianziLimit = parseInt(document.getElementById("p_dianziLimit").value);
-                let bu60Limt = parseInt(document.getElementById("p_bu60Limt").value);
-                let min = parseInt(document.getElementById("p_min").value);
-                let max = parseInt(document.getElementById("p_max").value);
-                let startDraw = parseInt(document.getElementById("p_startDraw").value);
-                let everyPoorFreeDraw = parseInt(document.getElementById("p_everyPoorFreeDraw").value);
-                let isDian = document.getElementById("p_isDian").checked;
-                let targetDrawDianLimt = parseInt(document.getElementById("p_targetDrawDianLimt").value);
-                let hyper = parseInt(document.getElementById("p_hyper").value);
-                let hyperCount = parseInt(document.getElementById("p_hyperCount").value);
-                let hyperBu240 = parseInt(document.getElementById("p_hyperBu240").value);
-                let useLimit = parseInt(document.getElementById("p_useLimit").value);
-                let priceChange = parseInt(document.getElementById("p_priceChange").value);
-
-                // 3. 执行
-                realDraw(totalCount, pool, dianzi, dianziLimit, bu60Limt, min, max, startDraw, everyPoorFreeDraw, isDian, targetDrawDianLimt, hyper, hyperCount, hyperBu240, useLimit, priceChange);
+                try {
+                    if (isTestMode) {
+                        testMode(G.totalCount, G.pool, G.dianzi, G.dianziLimit, G.bu60Limt, G.min, G.max, G.startDraw, G.everyPoorFreeDraw,
+                            G.isDian, G.targetDrawDianLimt, G.hyper, G.hyperCount, G.hyperBu240, G.useLimit, G.priceChange,
+                            G.nowPoorDrawBase, G.nowDraw6NumBase, G.isGetTargetBase, true, G.isDianTestBase, G.testMaxBase, G.targetPoolIndex);
+                    } else {
+                        testMode(G.totalCount, G.pool, G.dianzi, G.dianziLimit, G.bu60Limt, G.min, G.max, G.startDraw, G.everyPoorFreeDraw,
+                            G.isDian, G.targetDrawDianLimt, G.hyper, G.hyperCount, G.hyperBu240, G.useLimit, G.priceChange,
+                            G.nowPoorDrawBase, G.nowDraw6NumBase, G.isGetTargetBase, false, false, 0, 0);
+                    }
+                } catch (e) {
+                    log("错误: " + e.message);
+                    console.error(e);
+                }
             }, 50);
         }
-
     </script>
 </body>
+
 </html>
